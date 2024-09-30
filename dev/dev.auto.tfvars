@@ -1,4 +1,20 @@
 
+## Common Tags
+
+common_tags = {
+  "Environment"   = "DEV"
+  "AutoUpdate"    = "Yes"
+  "ApplicationId" = "LEN0013"
+  "Project"       = "Lennar"
+}
+
+## Subscriptions
+subscriptions = [
+  {
+
+  }
+]
+
 ## Resource Groups
 resource_groups = [
   {
@@ -17,6 +33,7 @@ vnets = [
     name                = "LEN-LZ-VNET-01"
     address_space       = ["10.2.0.0/16"]
     resource_group_name = "LennarAzureLZ-RG-01"
+    dns_servers         = ["10.7.7.7"]
   }
 ]
 
@@ -81,22 +98,81 @@ nsg_rules = [
   }
 ]
 
+
 ## Route Table
 
-route_tables=[
+route_tables = [
   {
-    name = "LEN-RT-DEV-01"
-    resource_group_name = "LennarAzureLZ-RG-01"
+    name                          = "LEN-RT-DEV-01"
+    resource_group_name           = "LennarAzureLZ-RG-01"
     disable_bgp_route_propagation = false
-    subnet         = "LEN-LZ-SNET-02"
-    vnet_name      = "LEN-LZ-VNET-01"
+    subnet                        = "LEN-LZ-SNET-02"
+    vnet_name                     = "LEN-LZ-VNET-01"
     routes = [
       {
-        name                   = "example"
-        address_prefix         = "10.100.0.0/14"
-        next_hop_type          = "VirtualAppliance"
-        next_hop_in_ip_address = "10.10.1.1"
+        name           = "route1"
+        address_prefix = "10.2.0.0/16"
+        next_hop_type  = "VnetLocal"
       }
     ]
+  }
+]
+
+
+## Budget
+
+budget_details = [
+  {
+    name          = "Lennar-Monthly-Budget"
+    budget_amount = 1000
+    time_grain    = "Monthly"
+    start_date    = "2024-09-01T00:00:00Z"
+    end_date      = "2024-10-01T00:00:00Z"
+
+    notifications = [
+      {
+        threshold      = 80.0 # 80% usage
+        operator       = "GreaterThan"
+        contact_emails = ["jitenderyadavofc@gmail.com"]
+        contact_roles  = ["Owner", "Contributor"]
+        threshold_type = "Forecasted"
+        enabled        = true
+      },
+      {
+        threshold      = 100.0 # 80% usage
+        operator       = "GreaterThan"
+        contact_emails = ["jitenderyadavofc@gmail.com"]
+        contact_roles  = ["Owner", "Contributor"]
+        threshold_type = "Forecasted"
+        enabled        = true
+      }
+    ]
+  }
+]
+
+### RBAC Roles
+
+role_definitions = [
+  {
+    role_definition_name = "00000000-0000-0000-0000-000000000001"
+    scope                = "/subscriptions/731257cc-4ff2-4612-b6b0-3463b086522f"
+    actions              = ["*"]
+    not_actions          = ["*"]
+    assignable_scopes    = ["/subscriptions/731257cc-4ff2-4612-b6b0-3463b086522f"]
+  }
+]
+
+role_assignments = [
+  { name                   = "00000000-0000-0000-0000-000000000003"
+    role_definition_name   = "00000000-0000-0000-0000-000000000001"
+    principal_id           = "429a5f5f-5764-4031-a7f4-a0a499fc3c52"
+    scope                  = "/subscriptions/731257cc-4ff2-4612-b6b0-3463b086522f"
+    custom_role_definition = true
+  },
+  { name                   = "00000000-0000-0000-0000-000000000004"
+    role_definition_name   = "Reader"
+    principal_id           = "429a5f5f-5764-4031-a7f4-a0a499fc3c52"
+    scope                  = "/subscriptions/731257cc-4ff2-4612-b6b0-3463b086522f"
+    custom_role_definition = false
   }
 ]
